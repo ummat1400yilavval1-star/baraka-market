@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baraka Market - Denov va Atrof Tumanlar Uchun Maishiy Texnika</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Header / Navigatsiya -->
+    <header class="bg-emerald-700 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-store text-2xl text-amber-400"></i>
+                <span class="text-xl font-bold tracking-wide">BARAKA MARKET</span>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleCart()" class="relative p-2 bg-emerald-800 rounded-full hover:bg-emerald-900 transition">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-amber-400 text-emerald-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </button>
+                <button onclick="toggleAdminPanel()" class="text-xs bg-emerald-900 hover:bg-black px-3 py-1.5 rounded-lg border border-emerald-500">
+                    <i class="fa-solid fa-user-lock mr-1"></i> Admin
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner -->
+    <section class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white py-6 px-4">
+        <div class="max-w-7xl mx-auto text-center md:text-left flex flex-col md:flex-row justify-between items-center">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-amber-300">1 Oylik Halol Savdo & Tillo Garovi</h1>
+                <p class="text-sm md:text-base mt-1 text-emerald-100">Denov, Oltinsoy, Sariosiyo, Uzun va Sho'rchi bo'ylab 1 sutkada yetkazib beramiz!</p>
+            </div>
+            <div class="mt-3 md:mt-0 bg-emerald-900/80 border border-amber-400/40 rounded-lg p-2.5 text-xs text-amber-200">
+                <i class="fa-solid fa-shield-halal text-amber-400 mr-1"></i> 100% Islomiy Murabaha tamoyili
+            </div>
+        </div>
+    </section>
+
+    <!-- Asosiy Mahsulotlar Ro'yxati -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-800 border-l-4 border-emerald-600 pl-3">Katalog (BILLZ Baza)</h2>
+            <button onclick="fetchProducts()" class="text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1.5 rounded flex items-center">
+                <i class="fa-solid fa-rotate mr-1"></i> F5 (Yangilash)
+            </button>
+        </div>
+
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Products will be injected here dynamically -->
+        </div>
+    </main>
+
+    <!-- Savat Modali (Cart Drawer) -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full shadow-2xl p-6 flex flex-col">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-lg font-bold"><i class="fa-solid fa-cart-shopping text-emerald-600 mr-2"></i>Savat</h3>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-black"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div id="cart-items" class="flex-grow overflow-y-auto py-4 space-y-4"></div>
+            <div class="border-t pt-4">
+                <div class="text-lg font-bold flex justify-between mb-4">
+                    <span>Jami:</span>
+                    <span id="cart-total" class="text-emerald-700">0 so'm</span>
+                </div>
+                <button onclick="showCheckout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow-lg">
+                    Rasmiylashtirish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Profit Share Modal -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-lg text-emerald-900"><i class="fa-solid fa-chart-line mr-2"></i>Admin Dashboard (Kelishilgan Ulush)</h3>
+                <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-black"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="py-4 space-y-3 text-sm">
+                <p class="text-gray-600">Raxbar bilan kelishuvga ko'ra har bir sotilgan mahsulotdan biriktirilgan **3% ulush** sizning shaxsiy balansingizga o'tadi.</p>
+                <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
+                    <span class="text-xs text-gray-500 block">Jami Hisoblangan Admin Ulushi:</span>
+                    <span id="admin-total-share" class="text-2xl font-black text-emerald-700">0 so'm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-6 text-center text-xs">
+        <p>© 2026 Baraka Market. Denov, Sariosiyo, Oltinsoy, Uzun, Sho'rchi tumanlari bo'ylab xizmat ko'rsatiladi.</p>
+    </footer>
+
+    <script>
+        const BACKEND_URL = "http://localhost:5000"; // Production me'yoriga moslab o'zgartiriladi
+        let productsData = [];
+        let cart = [];
+        let adminTotalProfit = 0;
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/products`);
+                productsData = await res.json();
+                renderProducts();
+            } catch (e) {
+                console.error("Xato:", e);
+            }
+        }
+
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = productsData.map(p => `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition">
+                    <img src="${p.image}" class="h-48 w-full object-cover">
+                    <div class="p-4 flex-grow flex flex-col justify-between">
+                        <div>
+                            <span class="text-xs text-emerald-600 font-semibold uppercase">${p.category}</span>
+                            <h3 class="font-bold text-gray-800 text-base mt-1 line-clamp-2">${p.name}</h3>
+                        </div>
+                        <div class="mt-4 space-y-1 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            <div class="text-xs text-gray-500">Naqd narxi: <span class="font-bold text-gray-800">${p.cashPrice.toLocaleString()} so'm</span></div>
+                            <div class="text-xs text-emerald-700 font-bold">1 Oylik (Tillo garovi): <span>${p.murabahaPrice.toLocaleString()} so'm</span></div>
+                        </div>
+                        <button onclick="addToCart('${p.id}')" class="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition">
+                            <i class="fa-solid fa-cart-plus mr-1"></i> Savatga olish
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(id) {
+            const item = productsData.find(p => p.id === id);
+            if(item) {
+                cart.push(item);
+                adminTotalProfit += item.adminSharePerSale;
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('admin-total-share').innerText = adminTotalProfit.toLocaleString() + " so'm";
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-modal').classList.toggle('hidden');
+        }
+
+        function toggleAdminPanel() {
+            document.getElementById('admin-modal').classList.toggle('hidden');
+        }
+
+        window.onload = fetchProducts;
+    </script>
+</body>
+</html>
